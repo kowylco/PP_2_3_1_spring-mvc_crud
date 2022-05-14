@@ -7,11 +7,12 @@ import web.model.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.util.List;
 @Component
 public class UserDAOImpl implements UserDAO{
     @PersistenceContext
-    EntityManager em;
+    private EntityManager em;
     @Override
     @Transactional
     public void saveUser(User user) {
@@ -21,16 +22,14 @@ public class UserDAOImpl implements UserDAO{
     @Override
     @Transactional
     public void updateUserByID(int id, User user) {
-        User userToUpd = em.find(User.class, id);
-        userToUpd.setName(user.getName());
-        userToUpd.setAge(user.getAge());
+        em.merge(user);
     }
 
     @Override
     @Transactional
     public void deleteUserById(int id) {
-        User userToDelete = em.find(User.class, id);
-        em.remove(userToDelete);
+        Query q = em.createQuery("DELETE FROM User WHERE id=:id");
+        q.setParameter("id", id).executeUpdate();
     }
 
     @Override
